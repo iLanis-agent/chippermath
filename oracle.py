@@ -1,23 +1,13 @@
 #!/usr/bin/env python3
 # Chipper Math oracle - mirrors engine.js float-for-float.
+# No feeding or capacity verdicts: pile and schedule arithmetic only.
 import json, math
-SELF_FEED = 0.7
 REDUCTION = 10
 def r1(x): return math.floor(x*10+0.5)/10
 def f1(x): return "%.1f" % r1(x)
 def jsnum(x):
     i = int(x)
     return i if x == i else x
-
-def capacity_plan(claim, branch):
-    if not (claim > 0): return {"error": "the claimed inches must be above zero"}
-    if not (branch > 0): return {"error": "the branch inches must be above zero"}
-    honest_raw = claim * SELF_FEED
-    verdict = "self-feeds and asks for more" if branch <= honest_raw else ("feeds with persuasion" if branch <= claim else "is a job for the saw, not the hopper")
-    return {"honestIn": jsnum(r1(honest_raw)), "verdict": verdict}
-def render_capacity(r, claim, branch):
-    return ("The %s-inch claim honestly self-feeds %s inches at the 0.7 norm; the %s-inch branch %s."
-            % (claim, f1(r["honestIn"]), branch, r["verdict"]))
 
 def pile_plan(pile, bag):
     if not (pile > 0): return {"error": "the pile cubic feet must be above zero"}
@@ -45,17 +35,14 @@ def render_weekend(r, count, avg, free):
             % (count, f1(r["each"]), min_word, r["verdict"]))
 
 CASES = [
-    ("capacity", (3,1.5)), ("capacity", (3,2.5)), ("capacity", (3,4)),
-    ("capacity", (2,1.4)), ("capacity", (4,3)), ("capacity", (2,2.5)),
     ("pile", (20,2)), ("pile", (45,2)), ("pile", (150,2)),
     ("pile", (12,2)), ("pile", (80,3)), ("pile", (200,2)),
     ("weekend", (40,1.5,90)), ("weekend", (40,1.5,30)), ("weekend", (60,0.5,45)),
     ("weekend", (25,2.5,60)), ("weekend", (100,1.2,120)), ("weekend", (30,0.8,20)),
-    ("capacity", (0,1.5)), ("capacity", (3,0)),
     ("pile", (0,2)), ("pile", (20,0)),
     ("weekend", (0,1.5,90)), ("weekend", (40,0,90)), ("weekend", (40,1.5,0)),
 ]
-PLANS = {"capacity": (capacity_plan, render_capacity), "pile": (pile_plan, render_pile), "weekend": (weekend_plan, render_weekend)}
+PLANS = {"pile": (pile_plan, render_pile), "weekend": (weekend_plan, render_weekend)}
 out = []
 for tool, args in CASES:
     plan, render = PLANS[tool]
