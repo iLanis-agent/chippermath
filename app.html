@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chipper Math - the app</title>
+<style>
+  :root { --accent: #7a5230; }
+  * { box-sizing: border-box; }
+  body { font-family: Georgia, serif; max-width: 44em; margin: 2em auto; padding: 0 1em; color: #222; background: #fbfaf7; }
+  h1 { color: var(--accent); margin-bottom: 0.1em; }
+  .tag { color: var(--accent); font-style: italic; margin-top: 0; }
+  .card { background: #fff; border: 1px solid #ddd; border-left: 4px solid var(--accent); border-radius: 6px; padding: 1em 1.2em; margin: 1.2em 0; }
+  h3 { margin-top: 0; }
+  label { display: block; font-size: 0.9em; font-weight: 600; margin: 0.7em 0 0.2em; }
+  input { width: 100%; max-width: 12em; padding: 0.4em 0.5em; font-size: 1em; border: 1px solid #bbb; border-radius: 4px; background: #f4f3ef; }
+  .big { font-weight: 600; color: var(--accent); line-height: 1.45; margin-top: 0.9em; }
+  .err { color: #a33; }
+  a { color: var(--accent); }
+  .foot { margin-top: 2.5em; font-size: 0.85em; color: #777; }
+</style>
+</head>
+<body>
+<h1>Chipper Math</h1>
+<p class="tag">Capacity truth, pile truth and weekend truth - labeled norms, honest arithmetic.</p>
+
+<div class="card">
+  <h3>The capacity truth</h3>
+  <label for="c-claim">Claimed max branch (inches)</label>
+  <input id="c-claim" type="number" step="any" value="3">
+  <label for="c-branch">Your branch (inches)</label>
+  <input id="c-branch" type="number" step="any" value="1.5">
+  <p class="big" id="c-out"></p>
+</div>
+
+<div class="card">
+  <h3>The pile truth</h3>
+  <label for="p-pile">Branch pile (cubic feet)</label>
+  <input id="p-pile" type="number" step="any" value="20">
+  <label for="p-bag">Your bags (cubic feet each)</label>
+  <input id="p-bag" type="number" step="any" value="2">
+  <p class="big" id="p-out"></p>
+</div>
+
+<div class="card">
+  <h3>The weekend truth</h3>
+  <label for="w-count">Branches to feed</label>
+  <input id="w-count" type="number" step="any" value="40">
+  <label for="w-avg">Average branch (inches)</label>
+  <input id="w-avg" type="number" step="any" value="1.5">
+  <label for="w-free">Free minutes today</label>
+  <input id="w-free" type="number" step="any" value="90">
+  <p class="big" id="w-out"></p>
+</div>
+
+<p class="foot">The 0.7 self-feed norm, the 10:1 reduction norm and the minutes-per-branch norms are labeled norms - the arithmetic is honest, and the last branch at dusk keeps the honest ledger.</p>
+
+<script src="engine.js"></script>
+<script>
+function g(id){ return document.getElementById(id); }
+function v(id){ return parseFloat(g(id).value); }
+function show(id, msg, isErr){ var el = g(id); el.textContent = msg; el.className = isErr ? "err big" : "big"; }
+
+function runCapacity(){
+  var args = [v("c-claim"), v("c-branch")];
+  var r = ChipperMath.capacityPlan.apply(null, args);
+  if (r.error) return show("c-out", r.error, true);
+  show("c-out", ChipperMath.renderCapacity.apply(null, [r].concat(args)), false);
+}
+function runPile(){
+  var args = [v("p-pile"), v("p-bag")];
+  var r = ChipperMath.pilePlan.apply(null, args);
+  if (r.error) return show("p-out", r.error, true);
+  show("p-out", ChipperMath.renderPile.apply(null, [r].concat(args)), false);
+}
+function runWeekend(){
+  var args = [v("w-count"), v("w-avg"), v("w-free")];
+  var r = ChipperMath.weekendPlan.apply(null, args);
+  if (r.error) return show("w-out", r.error, true);
+  show("w-out", ChipperMath.renderWeekend.apply(null, [r].concat(args)), false);
+}
+
+["c-claim","c-branch"].forEach(function(id){ g(id).addEventListener("input", runCapacity); });
+["p-pile","p-bag"].forEach(function(id){ g(id).addEventListener("input", runPile); });
+["w-count","w-avg","w-free"].forEach(function(id){ g(id).addEventListener("input", runWeekend); });
+runCapacity(); runPile(); runWeekend();
+</script>
+</body>
+</html>
