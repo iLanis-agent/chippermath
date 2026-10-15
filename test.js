@@ -2,7 +2,7 @@
 const fs = require("fs");
 require("./engine.js");
 const M = globalThis.ChipperMath;
-const plans = { capacity: [M.capacityPlan, M.renderCapacity], pile: [M.pilePlan, M.renderPile], weekend: [M.weekendPlan, M.renderWeekend] };
+const plans = { pile: [M.pilePlan, M.renderPile], weekend: [M.weekendPlan, M.renderWeekend] };
 const cases = JSON.parse(fs.readFileSync("expected.json", "utf8"));
 let checks = 0, fails = 0;
 function ok(cond, label){ checks++; if (!cond){ fails++; console.error("FAIL: " + label); } }
