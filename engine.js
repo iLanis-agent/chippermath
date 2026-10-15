@@ -1,22 +1,11 @@
 // Chipper Math engine - wood chipper honesty, labeled norms, honest arithmetic.
+// No feeding or capacity verdicts: what a chipper can safely take is the
+// manufacturer's call. Only pile and schedule arithmetic here.
 (function(root){
 "use strict";
-var SELF_FEED = 0.7; // labeled norm: branches above this share of the claim need persuasion
 var REDUCTION = 10;  // labeled norm: honest 10:1 pile-to-chips reduction
 function r1(x){ return Math.round(x*10)/10; }
 function f1(x){ return r1(x).toFixed(1); }
-
-function capacityPlan(claimIn, branchIn){
-  if (!(claimIn > 0)) return { error: "the claimed inches must be above zero" };
-  if (!(branchIn > 0)) return { error: "the branch inches must be above zero" };
-  var honestRaw = claimIn * SELF_FEED;
-  var verdict = branchIn <= honestRaw ? "self-feeds and asks for more"
-    : (branchIn <= claimIn ? "feeds with persuasion" : "is a job for the saw, not the hopper");
-  return { honestIn: r1(honestRaw), verdict: verdict };
-}
-function renderCapacity(r, claimIn, branchIn){
-  return "The " + claimIn + "-inch claim honestly self-feeds " + f1(r.honestIn) + " inches at the 0.7 norm; the " + branchIn + "-inch branch " + r.verdict + ".";
-}
 
 function pilePlan(pileCuft, bagCuft){
   if (!(pileCuft > 0)) return { error: "the pile cubic feet must be above zero" };
@@ -47,5 +36,5 @@ function renderWeekend(r, count, avgIn, freeMin){
   return count + " branches at about " + f1(r.each) + " honest minutes each is " + minWord + " - " + r.verdict + ".";
 }
 
-root.ChipperMath = { capacityPlan: capacityPlan, renderCapacity: renderCapacity, pilePlan: pilePlan, renderPile: renderPile, weekendPlan: weekendPlan, renderWeekend: renderWeekend };
+root.ChipperMath = { pilePlan: pilePlan, renderPile: renderPile, weekendPlan: weekendPlan, renderWeekend: renderWeekend };
 })(typeof window !== "undefined" ? window : globalThis);
