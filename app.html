@@ -11,6 +11,8 @@
   h1 { color: var(--accent); margin-bottom: 0.1em; }
   .tag { color: var(--accent); font-style: italic; margin-top: 0; }
   .card { background: #fff; border: 1px solid #ddd; border-left: 4px solid var(--accent); border-radius: 6px; padding: 1em 1.2em; margin: 1.2em 0; }
+  .boundary { border-left-color: #a33; background: #fdf5f3; }
+  .boundary h3 { color: #a33; }
   h3 { margin-top: 0; }
   label { display: block; font-size: 0.9em; font-weight: 600; margin: 0.7em 0 0.2em; }
   input { width: 100%; max-width: 12em; padding: 0.4em 0.5em; font-size: 1em; border: 1px solid #bbb; border-radius: 4px; background: #f4f3ef; }
@@ -22,15 +24,11 @@
 </head>
 <body>
 <h1>Chipper Math</h1>
-<p class="tag">Capacity truth, pile truth and weekend truth - labeled norms, honest arithmetic.</p>
+<p class="tag">Pile truth and weekend truth - labeled norms, honest arithmetic.</p>
 
-<div class="card">
-  <h3>The capacity truth</h3>
-  <label for="c-claim">Claimed max branch (inches)</label>
-  <input id="c-claim" type="number" step="any" value="3">
-  <label for="c-branch">Your branch (inches)</label>
-  <input id="c-branch" type="number" step="any" value="1.5">
-  <p class="big" id="c-out"></p>
+<div class="card boundary">
+  <h3>The boundary</h3>
+  <p>Chipper Math keeps pile and schedule arithmetic only. It gives no feeding or capacity verdicts - what your chipper can safely take is the manufacturer's call. Follow the manual's capacity and safety instructions, and never force a branch the machine wasn't built for.</p>
 </div>
 
 <div class="card">
@@ -53,7 +51,7 @@
   <p class="big" id="w-out"></p>
 </div>
 
-<p class="foot">The 0.7 self-feed norm, the 10:1 reduction norm and the minutes-per-branch norms are labeled norms - the arithmetic is honest, and the last branch at dusk keeps the honest ledger.</p>
+<p class="foot">The 10:1 reduction norm and the minutes-per-branch norms are labeled norms - the arithmetic is honest, and the last branch at dusk keeps the honest ledger.</p>
 
 <script src="engine.js"></script>
 <script>
@@ -61,12 +59,6 @@ function g(id){ return document.getElementById(id); }
 function v(id){ return parseFloat(g(id).value); }
 function show(id, msg, isErr){ var el = g(id); el.textContent = msg; el.className = isErr ? "err big" : "big"; }
 
-function runCapacity(){
-  var args = [v("c-claim"), v("c-branch")];
-  var r = ChipperMath.capacityPlan.apply(null, args);
-  if (r.error) return show("c-out", r.error, true);
-  show("c-out", ChipperMath.renderCapacity.apply(null, [r].concat(args)), false);
-}
 function runPile(){
   var args = [v("p-pile"), v("p-bag")];
   var r = ChipperMath.pilePlan.apply(null, args);
@@ -80,10 +72,9 @@ function runWeekend(){
   show("w-out", ChipperMath.renderWeekend.apply(null, [r].concat(args)), false);
 }
 
-["c-claim","c-branch"].forEach(function(id){ g(id).addEventListener("input", runCapacity); });
 ["p-pile","p-bag"].forEach(function(id){ g(id).addEventListener("input", runPile); });
 ["w-count","w-avg","w-free"].forEach(function(id){ g(id).addEventListener("input", runWeekend); });
-runCapacity(); runPile(); runWeekend();
+runPile(); runWeekend();
 </script>
 </body>
 </html>
